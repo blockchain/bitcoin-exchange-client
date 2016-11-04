@@ -6,19 +6,17 @@ module.exports = function (config) {
 
     browsers: ['PhantomJS'],
 
-    browserNoActivityTimeout: 60000,
+    browserNoActivityTimeout: 1000,
 
-    // reportSlowerThan: 50,
+    reportSlowerThan: 50,
 
     logLevel: config.LOG_WARN,
 
     client: {
-      captureConsole: false
+      captureConsole: true
     },
 
     autoWatch: true,
-
-    // logLevel: karma.LOG_DEBUG,
 
     reporters: ['progress', 'coverage'],
 

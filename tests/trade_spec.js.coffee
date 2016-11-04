@@ -33,12 +33,16 @@ describe "Trade", ->
 
   describe "class", ->
     describe "new Trade()", ->
-      delegate = {
-        getReceiveAddress: () ->
-      }
+      beforeEach ->
+        delegate = {
+          getReceiveAddress: () ->
+        }
+        api = {
+        }
 
-      it "...", ->
-        pending()
+      it "should create a Trade instance", ->
+        trade  = new Trade({}, api, delegate)
+        expect(trade instanceof Trade).toBeTruthy()
 
     describe "_checkOnce()", ->
       trade = undefined
@@ -51,19 +55,43 @@ describe "Trade", ->
           refresh: () -> Promise.resolve()
         }
         delegate = {
-          debug: true
+          debug: false
           save: () -> Promise.resolve()
           getReceiveAddress: () ->
           checkAddress: (address) ->
-            Promise.resolve({hash: "tx-hash", confirmations: 0}, 1)
+            if (address == 'trade-address')
+              Promise.resolve({hash: "tx-hash", confirmations: 0}, 1)
+            else
+              Promise.resolve(null, 0)
         }
 
         spyOn(trade, "_setTransactionHash").and.callThrough()
+        spyOn(trade, "refresh").and.callThrough()
 
-      it "should resolve immedidatley if there are no transactions", (done) ->
+      it "should resolve immedidatley if there are no trades", (done) ->
         filter = () -> true
 
         promise = Trade._checkOnce([], delegate)
+
+        expect(promise).toBeResolved(done)
+
+      it "should call refresh()", (done) ->
+        checks = () ->
+          expect(trade.refresh).toHaveBeenCalled()
+          done()
+
+        promise = Trade._checkOnce([trade], delegate).then(checks)
+
+        expect(promise).toBeResolved(done)
+
+      it "should not call refresh() if no transaction is found", (done) ->
+        checks = () ->
+          expect(trade.refresh).not.toHaveBeenCalled()
+          done()
+
+        trade.receiveAddress = 'wrong-address'
+
+        promise = Trade._checkOnce([trade], delegate).then(checks)
 
         expect(promise).toBeResolved(done)
 
@@ -71,6 +99,18 @@ describe "Trade", ->
         checks = () ->
           expect(trade._setTransactionHash).toHaveBeenCalled()
           done()
+
+        promise = Trade._checkOnce([trade], delegate).then(checks)
+
+        expect(promise).toBeResolved(done)
+
+      it "should call _setTransactionHash without refresh for completed trades", (done) ->
+        checks = () ->
+          expect(trade._setTransactionHash).toHaveBeenCalled()
+          expect(trade.refresh).not.toHaveBeenCalled()
+          done()
+
+        trade.state = 'completed'
 
         promise = Trade._checkOnce([trade], delegate).then(checks)
 
@@ -161,16 +201,35 @@ describe "Trade", ->
 
       api = {
       }
-      trade = new Trade(tradeJSON, delegate)
+      trade = new Trade({}, api, delegate)
 
     describe "getters", ->
-      it "...", ->
-        pending()
+      it "should work", ->
+        expect(trade.id).toEqual(1)
+        expect(trade.createdAt).toBeDefined()
+        expect(trade.createdAt instanceof Date).toBeTruthy()
+        expect(trade.inCurrency).toEqual('USD')
+        expect(trade.outCurrency).toEqual('BTC')
+        expect(trade.medium).toEqual('bank')
+        expect(trade.inAmount).toEqual(1000)
+        expect(trade.sendAmount).toEqual(1000)
+        expect(trade.outAmount).toEqual(5000000)
+        expect(trade.outAmountExpected).toEqual(5000000)
+        expect(trade.receiveAddress).toEqual('1abc')
+        expect(trade.accountIndex).toEqual(0)
+        expect(trade.bitcoinReceived).toEqual(false)
+        expect(trade.confirmed).toEqual(false)
+        expect(trade.txHash).toEqual(null)
+
 
     describe "debug", ->
       it "can be set", ->
         trade.debug = true
         expect(trade.debug).toEqual(true)
+
+    describe "self()", ->
+      it "should return this", ->
+        expect(trade.self()).toBe(trade)
 
     describe "process", ->
       beforeEach ->
@@ -186,6 +245,51 @@ describe "Trade", ->
         trade.process()
         expect(trade._delegate.releaseReceiveAddress).not.toHaveBeenCalled()
 
+    describe "buy()", ->
+      quote = undefined
+
+      beforeEach ->
+        spyOn(Trade.prototype.__proto__, "_monitorAddress").and.callFake(() ->
+        )
+
+        quote = {
+          id: 101
+          expiresAt: new Date(new Date().getTime() + 100000)
+          api: api
+          delegate: delegate
+          debug: false
+          _TradeClass: Trade
+        }
+
+      it 'should check that quote  is still valid', ->
+        quote._expiresAt = new Date(new Date().getTime() - 100000)
+        expect(() -> t.buy(quote, 'card')).toThrow()
+
+      it "should watch the address", (done) ->
+        checks = (trade) ->
+          expect(trade._monitorAddress).toHaveBeenCalled()
+
+        promise = Trade.buy(quote, 'bank')
+          .then(checks)
+
+        expect(promise).toBeResolved(done)
+
+      it "should handle error", (done) ->
+        promise = Trade.buy(quote, 'fail')
+
+        expect(promise).toBeRejected(done)
+
+    describe "watchAddress", ->
+      it "should set _watchAddressResolve", ->
+        trade.watchAddress()
+        expect(trade._watchAddressResolve).toBeDefined()
+
+      it "should not set _watchAddressResolve if tx is already matched", ->
+        trade._txHash = "1234"
+        trade.watchAddress()
+        expect(trade._watchAddressResolve).not.toBeDefined()
+
+
     describe "_monitorAddress()", ->
       refreshedState = "completed"
 
@@ -199,13 +303,7 @@ describe "Trade", ->
 
         spyOn(trade, "_watchAddressResolve")
 
-        spyOn(trade, "refresh").and.callFake(() ->
-          trade._state = refreshedState
-          {
-            then: (cb) ->
-              cb()
-          }
-        )
+        spyOn(trade, "refresh").and.callThrough()
 
         spyOn(trade._delegate, "save").and.callFake(() ->
           {
@@ -267,26 +365,16 @@ describe "Trade", ->
           receiveAddress: "trade-address"
           _delegate: delegate
           state: 'completed'
-          debug: true
+          debug: false
           _txHash: null
           _setTransactionHash: Trade.prototype._setTransactionHash
+          _watchAddressResolve: () ->
         }
 
-      describe "for a test trade", ->
-        it "should set the hash if trade is completed", ->
-          trade.state = 'completed_test'
+        spyOn(trade, "_watchAddressResolve").and.callThrough()
 
-          trade._setTransactionHash(tx, 1, delegate)
-          expect(trade._txHash).toEqual('tx-hash')
-
-
-        it "should not override the hash if set earlier", ->
-          trade.state = 'completed_test'
-          trade._txHash = 'tx-hash-before'
-
-          trade._setTransactionHash(tx, 1, delegate)
-
-          expect(trade._txHash).toEqual('tx-hash-before')
+      afterEach ->
+        trade = undefined
 
       describe "for a real trade", ->
         it "should set the hash if trade is completed", ->
@@ -304,6 +392,13 @@ describe "Trade", ->
 
           expect(trade._txHash).toEqual('tx-hash')
 
+        it "should resolve the watcher", ->
+          trade.state = 'completed'
+
+          trade._setTransactionHash(tx, 1, delegate)
+
+          expect(trade._watchAddressResolve).toHaveBeenCalled()
+
         it "should not override the hash if set earlier", ->
           trade.state = 'completed'
           trade._txHash = 'tx-hash-before'
@@ -319,6 +414,16 @@ describe "Trade", ->
 
           expect(trade._confirmations).toEqual(0)
 
+        it "should update the number of confirmations", ->
+          trade.state = 'completed'
+          tx.confirmations = 2
+          tx.hash = 'tx-hash-before'
+          trade._txHash = 'tx-hash-before'
+
+          trade._setTransactionHash(tx, 2, delegate)
+
+          expect(trade._confirmations).toEqual(2)
+
         it "should set _confirmed to true so it gets serialized", ->
           trade.state = 'completed'
           tx.confirmations = 6
@@ -327,3 +432,36 @@ describe "Trade", ->
           trade._setTransactionHash(tx, 1, delegate)
 
           expect(trade._confirmed).toEqual(true)
+
+      describe "for a test trade", ->
+        it "should set the hash if trade is completed", ->
+          trade.state = 'completed_test'
+          tx.hash = 'tx-hash'
+
+          trade._setTransactionHash(tx, 1, delegate)
+          expect(trade._txHash).toEqual('tx-hash')
+
+        it "should resolve the watcher", ->
+          trade.state = 'completed_test'
+
+          trade._setTransactionHash(tx, 1, delegate)
+
+          expect(trade._watchAddressResolve).toHaveBeenCalled()
+
+        it "should not override the hash if set earlier", ->
+          trade.state = 'completed_test'
+          trade._txHash = 'tx-hash-before'
+
+          trade._setTransactionHash(tx, 1, delegate)
+
+          expect(trade._txHash).toEqual('tx-hash-before')
+
+        it "should update the number of confirmations", ->
+          trade.state = 'completed_test'
+          tx.confirmations = 2
+          tx.hash = 'tx-hash-before'
+          trade._txHash = 'tx-hash-before'
+
+          trade._setTransactionHash(tx, 2, delegate)
+
+          expect(trade._confirmations).toEqual(2)

@@ -5,6 +5,7 @@ var assert = require('assert');
 class Trade {
   constructor (api, delegate) {
     assert(this.constructor !== Trade, 'Abstract Class');
+    assert(this.refresh, 'Subclass must implement refresh()');
     assert(api, 'API missing');
     assert(delegate, 'delegate missing');
     assert(typeof delegate.getReceiveAddress === 'function', 'delegate requires getReceiveAddress()');
@@ -137,10 +138,6 @@ class Trade {
     return Promise.all(promises).then(delegate.save.bind(delegate));
   }
 
-  refresh () {
-    // Subclass needs to implement this
-  }
-
   static buy (quote, medium, request) {
     assert(quote, 'Quote required');
     assert(quote.expiresAt > new Date(), 'QUOTE_EXPIRED');
@@ -205,14 +202,15 @@ class Trade {
         setConfirmations(tx);
         self._watchAddressResolve && self._watchAddressResolve();
       } else {
+        /* istanbul ignore if */
         if (self.debug) {
           console.info('Trade already matched, not calling _watchAddressResolve()');
         }
         if (self._txHash === tx.hash) {
-          /* istanbul ignore if */
           setConfirmations(tx);
         }
       }
+    /* istanbul ignore else */
     } else if (self.state === 'completed' || self.state === 'processing') {
       if (self._txHash) {
         // Multiple trades may reuse the same address if e.g. one is
