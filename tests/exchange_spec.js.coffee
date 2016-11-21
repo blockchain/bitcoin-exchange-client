@@ -89,6 +89,12 @@ describe "Exchange", ->
         e.debug = true
         expect(e.trades[0].debug).toEqual(true)
 
+    describe "api", ->
+      it "should be a getter", ->
+        api = {}
+        e._api = api
+        expect(e.api).toBe(api)
+
     describe "user", ->
       it "should be a getter", ->
         e._user = "1234"

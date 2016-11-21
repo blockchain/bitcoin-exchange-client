@@ -20,6 +20,8 @@ class Exchange {
     this._PaymentMediumClass = PaymentMediumClass;
   }
 
+  get api () { return this._api; }
+
   get debug () { return this._debug; }
   set debug (value) {
     this._debug = Boolean(value);
