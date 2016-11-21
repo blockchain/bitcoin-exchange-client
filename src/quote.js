@@ -34,9 +34,13 @@ class Quote {
 
   get quoteCurrency () { return this._quoteCurrency; }
 
+  get feeCurrency () { return this._feeCurrency; }
+
   get baseAmount () { return this._baseAmount; }
 
   get quoteAmount () { return this._quoteAmount; }
+
+  get feeAmount () { return this._feeAmount; }
 
   get expiresAt () { return this._expiresAt; }
 
