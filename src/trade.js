@@ -95,7 +95,7 @@ class Trade {
     this._delegate.monitorAddress(this.receiveAddress, function (hash, amount) {
       var checkAddress = () => self._setTransactionHash({hash: hash}, amount, self._delegate);
       if (self.state === 'completed' || self.state === 'processing' || self.state === 'completed_test') {
-        return checkAddress().then(save);
+        return Promise.resolve().then(checkAddress).then(save);
       } else {
         return self.refresh().then(checkAddress).then(save);
       }
