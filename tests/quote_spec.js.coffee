@@ -35,6 +35,8 @@ describe "Quote", ->
     q._quoteAmount = 1
     q._baseCurrency = 'EUR'
     q._quoteCurrency = 'BTC'
+    q._feeCurrency = 'EUR'
+    q._feeAmount = 1
     q._expiresAt = 1
 
   describe "class", ->
@@ -68,6 +70,8 @@ describe "Quote", ->
         expect(q.baseCurrency).toBe('EUR')
         expect(q.quoteCurrency).toBe('BTC')
         expect(q.baseAmount).toBe(1)
+        expect(q.feeCurrency).toBe('EUR')
+        expect(q.feeAmount).toBe(1)
         expect(q.quoteAmount).toBe(1)
         expect(q.id).toBe('1')
         expect(q.api).toBe(api)
