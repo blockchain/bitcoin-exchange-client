@@ -31,13 +31,12 @@ module.exports = function (config) {
 
     preprocessors: {
       'src/**/*.js': ['browserify'],
-      'tests/**/*.coffee': ['browserify']
+      'tests/**/*.js': ['browserify']
     },
 
     browserify: {
       configure: function (bundle) {
         bundle.once('prebundle', function () {
-          bundle.transform('coffeeify');
           bundle.transform('browserify-istanbul'); // Must go first
           bundle.transform('babelify', {
             presets: ['es2015'],
@@ -49,23 +48,10 @@ module.exports = function (config) {
       },
       debug: true
     },
-
-    coffeePreprocessor: {
-      // options passed to the coffee compiler
-      options: {
-        bare: true,
-        sourceMap: true
-      },
-      // transforming the filenames
-      transformPath: function (path) {
-        return path.replace(/\.coffee$/, '.js');
-      }
-    },
-
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
       'node_modules/jasmine-es6-promise-matchers/jasmine-es6-promise-matchers.js',
-      'tests/*_spec.js.coffee'
+      'tests/*_spec.js'
     ]
   };
 
