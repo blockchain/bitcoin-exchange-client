@@ -219,7 +219,6 @@ describe('Trade', function () {
         },
         removeLabeledAddress () {},
         releaseReceiveAddress () {},
-        commitReceiveAddress () {},
         save () { return Promise.resolve(); },
         deserializeExtraFields () {},
         getReceiveAddress () {},

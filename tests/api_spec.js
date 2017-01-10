@@ -28,8 +28,50 @@ describe('API', function () {
   );
 
   describe('instance', function () {
-    beforeEach(() => {
-      api = new API();
+    describe('accessTokenBased', function () {
+      beforeEach(() => {
+        api = new API({accessTokenBased: true});
+      });
+
+      describe('isLoggedIn', function () {
+        beforeEach(function () {
+          api._accessToken = 'access_token';
+          api._loginExpiresAt = new Date(new Date().getTime() + 100000);
+        });
+
+        it('checks if there is an access token', function () {
+          expect(api.isLoggedIn).toEqual(true);
+
+          api._accessToken = undefined;
+          expect(api.isLoggedIn).toEqual(false);
+        });
+
+        it("checks if the token hasn't expired", function () {
+          expect(api.isLoggedIn).toEqual(true);
+
+          api._loginExpiresAt = new Date(new Date().getTime() - 100000);
+          expect(api.isLoggedIn).toEqual(false);
+        });
+
+        it('should be a few seconds on the safe side', function () {
+          expect(api.isLoggedIn).toEqual(true);
+
+          api._loginExpiresAt = new Date(new Date().getTime());
+          expect(api.isLoggedIn).toEqual(false);
+        });
+      });
+    });
+
+    describe('not accessTokenBased', function () {
+      beforeEach(() => {
+        api = new API();
+      });
+
+      describe('isLoggedIn', function () {
+        it('should always return true', function () {
+          expect(api.isLoggedIn).toEqual(true);
+        });
+      });
     });
 
     describe('_request', function () {
