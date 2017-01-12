@@ -8,9 +8,11 @@ let stubs = {
 };
 
 const API = proxyquire('../src/api', stubs);
+const ConcreteAPI = proxyquire('../src/api-concrete', {});
 
 describe('API', function () {
-  let api;
+  let api; // Abstract class
+  let concreteAPI; // Subclass
 
   beforeEach(() =>
     JasminePromiseMatchers.install());
@@ -28,9 +30,19 @@ describe('API', function () {
   );
 
   describe('instance', function () {
+    describe('hasAccount', function () {
+      it('should be implemented by the subclass', function () {
+        concreteAPI = new ConcreteAPI();
+
+        expect(() => { api.hasAccount; }).toThrow();
+        expect(() => { concreteAPI.hasAccount; }).not.toThrow();
+      });
+    });
+
     describe('accessTokenBased', function () {
       beforeEach(() => {
         api = new API({accessTokenBased: true});
+        concreteAPI = new ConcreteAPI({accessTokenBased: true});
       });
 
       describe('isLoggedIn', function () {
@@ -60,16 +72,148 @@ describe('API', function () {
           expect(api.isLoggedIn).toEqual(false);
         });
       });
+
+      describe('login()', function () {
+        it('should require a subclass to implement this', function () {
+          expect(() => { api.login(); }).toThrow();
+          expect(() => { concreteAPI.login(); }).not.toThrow();
+        });
+      });
+
+      describe('verb', () => {
+        beforeEach(function () {
+          api._accessToken = 'access_token';
+          api._loginExpiresAt = new Date(new Date().getTime() + 100000);
+
+          spyOn(api, '_authRequest');
+        });
+
+        describe('GET', () =>
+          it('should make a GET request', function () {
+            api.authGET('/trades');
+            expect(api._authRequest).toHaveBeenCalled();
+            expect(api._authRequest.calls.argsFor(0)[0]).toEqual('GET');
+          })
+        );
+
+        describe('POST', () =>
+          it('should make a POST request', function () {
+            api.authPOST('/trades');
+            expect(api._authRequest).toHaveBeenCalled();
+            expect(api._authRequest.calls.argsFor(0)[0]).toEqual('POST');
+          })
+        );
+
+        describe('PATCH', () =>
+          it('should make a PATCH request', function () {
+            api.authPATCH('/trades');
+            expect(api._authRequest).toHaveBeenCalled();
+            expect(api._authRequest.calls.argsFor(0)[0]).toEqual('PATCH');
+          })
+        );
+
+        describe('PUT', () =>
+          it('should make a PUT request', function () {
+            api.authPUT('/trades');
+            expect(api._authRequest).toHaveBeenCalled();
+            expect(api._authRequest.calls.argsFor(0)[0]).toEqual('PUT');
+          })
+        );
+      });
+
+      describe('_authRequest', function () {
+        beforeEach(function () {
+          spyOn(api, '_request');
+          spyOn(api, 'login').and.callFake(() => {
+            return Promise.resolve();
+          });
+        });
+
+        it('should make a request if already logged in', function () {
+          api._accessToken = 'access_token';
+          api._loginExpiresAt = new Date(new Date().getTime() + 100000);
+
+          api._authRequest('GET', '/trades', {}, {});
+          expect(api.login).not.toHaveBeenCalled();
+          expect(api._request).toHaveBeenCalled();
+        });
+
+        it('should login first if needed', function () {
+          api._authRequest('GET', '/trades', {}, {});
+          expect(api.login).toHaveBeenCalled();
+        });
+      });
     });
 
     describe('not accessTokenBased', function () {
       beforeEach(() => {
         api = new API();
+        concreteAPI = new ConcreteAPI();
       });
 
       describe('isLoggedIn', function () {
-        it('should always return true', function () {
-          expect(api.isLoggedIn).toEqual(true);
+        it('should check if the user has an account', function () {
+          concreteAPI._hasAccount = true;
+          expect(concreteAPI.isLoggedIn).toEqual(true);
+
+          concreteAPI._hasAccount = false;
+          expect(concreteAPI.isLoggedIn).toEqual(false);
+        });
+      });
+
+      describe('login()', function () {
+        it('should not allow itself to be called', function () {
+          expect(() => { api.login(); }).toThrow();
+        });
+      });
+
+      describe('verb', () => {
+        beforeEach(function () {
+          spyOn(api, '_request');
+        });
+
+        describe('GET', () =>
+          it('should make a GET request', function () {
+            api.GET('/trades');
+            expect(api._request).toHaveBeenCalled();
+            expect(api._request.calls.argsFor(0)[0]).toEqual('GET');
+          })
+        );
+
+        describe('POST', () =>
+          it('should make a POST request', function () {
+            api.POST('/trades');
+            expect(api._request).toHaveBeenCalled();
+            expect(api._request.calls.argsFor(0)[0]).toEqual('POST');
+          })
+        );
+
+        describe('PATCH', () =>
+          it('should make a PATCH request', function () {
+            api.PATCH('/trades');
+            expect(api._request).toHaveBeenCalled();
+            expect(api._request.calls.argsFor(0)[0]).toEqual('PATCH');
+          })
+        );
+
+        describe('PUT', () =>
+          it('should make a PUT request', function () {
+            api.PUT('/trades');
+            expect(api._request).toHaveBeenCalled();
+            expect(api._request.calls.argsFor(0)[0]).toEqual('PUT');
+          })
+        );
+      });
+
+      describe('_authRequest', function () {
+        beforeEach(function () {
+          spyOn(api, '_request');
+          spyOn(api, 'login');
+        });
+
+        it('should make a request', function () {
+          api._authRequest('GET', '/trades', {}, {});
+          expect(api._request).toHaveBeenCalled();
         });
       });
     });
@@ -145,6 +289,14 @@ describe('API', function () {
           expect(promise).toBeRejectedWith('', done);
         })
       );
+
+      it('should fail if authorized request but not logged in', function () {
+        concreteAPI._hasAccount = false;
+        expect(() => { concreteAPI._request('GET', '/trades', {}, {}, true); }).toThrow();
+
+        concreteAPI._hasAccount = true;
+        expect(() => { concreteAPI._request('GET', '/trades', {}, {}, true); }).not.toThrow();
+      });
     });
   });
 });

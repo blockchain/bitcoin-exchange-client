@@ -12,9 +12,13 @@ class API {
     }
   }
 
+  get hasAccount () {
+    assert(false, 'Subclass must override hasAccount()');
+  }
+
   get isLoggedIn () {
     if (!this._accessTokenBased) {
-      return true;
+      return Boolean(this.hasAccount);
     } else {
       // Debug: + 60 * 19 * 1000 expires the login after 1 minute
       var tenSecondsFromNow = new Date(new Date().getTime() + 10000);
@@ -35,14 +39,16 @@ class API {
       return this._request(method, endpoint, data, true);
     };
 
-    if (this.isLoggedIn) {
+    if (!this._accessTokenBased || this.isLoggedIn) {
       return doRequest.bind(this)();
     } else {
       return this.login().then(doRequest.bind(this));
     }
   }
 
-  _request (method, url, data, headers) {
+  _request (method, url, data, headers, authorized) {
+    assert(!authorized || this.isLoggedIn, "Can't make authorized request if not logged in");
+
     headers = headers || {};
 
     headers['Content-Type'] = 'application/json';
