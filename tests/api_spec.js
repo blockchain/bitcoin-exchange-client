@@ -39,6 +39,13 @@ describe('API', function () {
           expect(api._production).toEqual(true);
         })
       );
+
+      describe('testnet', () =>
+        it('should set _testnet', function () {
+          api.testnet = true;
+          expect(api._testnet).toEqual(true);
+        })
+      );
     });
 
     describe('_request', function () {

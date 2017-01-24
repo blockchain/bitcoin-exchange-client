@@ -2,6 +2,15 @@ var Helpers = require('./helpers');
 var assert = require('assert');
 
 class API {
+  constructor () {
+    this._testnet = false;
+  }
+
+  set testnet (value) {
+    assert(Helpers.isBoolean(value), 'Boolean expected');
+    this._testnet = value;
+  }
+
   set production (value) {
     assert(Helpers.isBoolean(value), 'Boolean expected');
     this._production = value;

@@ -1,6 +1,6 @@
 {
   "name": "bitcoin-exchange-client",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Bitcoin Exchange base classes, use with e.g. coinify-exchange-client",
   "repository": {
     "type": "git",
