@@ -32,6 +32,15 @@ describe('API', function () {
       api = new API();
     });
 
+    describe('Properties', function () {
+      describe('production', () =>
+        it('should set _production', function () {
+          api.production = true;
+          expect(api._production).toEqual(true);
+        })
+      );
+    });
+
     describe('_request', function () {
       beforeEach(function () {
         fetchMock.get('/fail', {throws: 'fail'});

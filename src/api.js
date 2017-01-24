@@ -1,4 +1,12 @@
+var Helpers = require('./helpers');
+var assert = require('assert');
+
 class API {
+  set production (value) {
+    assert(Helpers.isBoolean(value), 'Boolean expected');
+    this._production = value;
+  }
+
   _request (method, url, data, headers) {
     headers = headers || {};
 
