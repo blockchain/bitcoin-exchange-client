@@ -11,3 +11,14 @@ cd ..
 rm -rf bitcoin-coinify-client/node_modules/bitcoin-exchange-client
 ln -s ../../bitcoin-exchange-client bitcoin-coinify-client/node_modules/bitcoin-exchange-client
 ```
+
+## Release
+
+Change version in `package.json`.
+
+```sh
+git commit -a -m "v0.1.0"
+git push
+git tag -s v0.1.0
+git push --tags
+```
