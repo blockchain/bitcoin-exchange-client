@@ -68,7 +68,6 @@ class Quote {
     } else {
       baseAmount = (amount / 100).toFixed(2);
     }
-
     return Promise.resolve(baseAmount);
   }
 

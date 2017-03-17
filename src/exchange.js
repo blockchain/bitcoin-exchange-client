@@ -65,6 +65,18 @@ class Exchange {
     return this._QuoteClass.getQuote(this._api, this._delegate, -amount, baseCurrency, quoteCurrency, this._debug);
   }
 
+  getSellQuote (amount, baseCurrency, quoteCurrency) {
+    console.log('getSellQuote in bitcoin-exchange-client', amount, baseCurrency, quoteCurrency)
+    assert(baseCurrency, 'Specify base currency');
+    assert(baseCurrency !== 'BTC' || quoteCurrency, 'Specify quote currency');
+
+    if (baseCurrency !== 'BTC') {
+      quoteCurrency = 'BTC';
+    }
+    console.log('getSellQuote', amount, baseCurrency, quoteCurrency)
+    return this._QuoteClass.getQuote(this._api, this._delegate, amount, baseCurrency, quoteCurrency, this._debug)
+  }
+
   updateList (list, items, ListClass) {
     var item;
     for (var i = 0; i < items.length; i++) {
