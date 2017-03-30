@@ -66,13 +66,7 @@ class Exchange {
   }
 
   getSellQuote (amount, baseCurrency, quoteCurrency) {
-    assert(baseCurrency, 'Specify base currency');
-    assert(baseCurrency !== 'BTC' || quoteCurrency, 'Specify quote currency');
-
-    if (baseCurrency !== 'BTC') {
-      quoteCurrency = 'BTC';
-    }
-    return this._QuoteClass.getQuote(this._api, this._delegate, amount, baseCurrency, quoteCurrency, this._debug);
+    return this.getBuyQuote(-amount, baseCurrency, quoteCurrency);
   }
 
   updateList (list, items, ListClass) {
