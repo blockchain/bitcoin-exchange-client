@@ -72,7 +72,7 @@ class Exchange {
     if (baseCurrency !== 'BTC') {
       quoteCurrency = 'BTC';
     }
-    return this._QuoteClass.getQuote(this._api, this._delegate, amount, baseCurrency, quoteCurrency, this._debug)
+    return this._QuoteClass.getQuote(this._api, this._delegate, amount, baseCurrency, quoteCurrency, this._debug);
   }
 
   updateList (list, items, ListClass) {
