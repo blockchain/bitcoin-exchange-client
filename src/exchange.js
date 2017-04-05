@@ -65,6 +65,10 @@ class Exchange {
     return this._QuoteClass.getQuote(this._api, this._delegate, -amount, baseCurrency, quoteCurrency, this._debug);
   }
 
+  getSellQuote (amount, baseCurrency, quoteCurrency) {
+    return this.getBuyQuote(-amount, baseCurrency, quoteCurrency);
+  }
+
   updateList (list, items, ListClass) {
     var item;
     for (var i = 0; i < items.length; i++) {
