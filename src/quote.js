@@ -93,6 +93,20 @@ class Quote {
                           .then(setPaymentMediums);
     }
   }
+
+  getSellPaymentMediums () {
+    var self = this;
+    var setPaymentMediums = function (paymentMediums) {
+      self._paymentMediums = paymentMediums;
+      return self.paymentMediums;
+    };
+    return this._PaymentMediumClass.getSellAccounts(this._api, this)
+      .then(setPaymentMediums);
+  }
+
+  addSellPaymentMedium (obj) {
+    return this._PaymentMediumClass.addBankAccount(this._api, obj);
+  }
 }
 
 module.exports = Quote;
