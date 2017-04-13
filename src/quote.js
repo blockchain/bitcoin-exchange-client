@@ -85,7 +85,6 @@ class Quote {
       inCurrency = this.quoteCurrency;
       outCurrency = this.baseCurrency;
     }
-
     if (this.paymentMediums) {
       return Promise.resolve(this.paymentMediums);
     } else {
@@ -94,19 +93,22 @@ class Quote {
     }
   }
 
-  getSellPaymentMediums () {
+  getPayoutMediums () {
     var self = this;
+    let outCurrency;
+    if (this.baseCurrency === 'BTC') {
+      outCurrency = this.quoteCurrency;
+    } else {
+      outCurrency = this.baseCurrency;
+    }
     var setPaymentMediums = function (paymentMediums) {
       self._paymentMediums = paymentMediums;
       return self.paymentMediums;
     };
-    return this._PaymentMediumClass.getSellAccounts(this._api, this)
+    return this._PaymentMediumClass.getAll('BTC', outCurrency, this._api, this)
       .then(setPaymentMediums);
   }
 
-  addSellPaymentMedium (obj) {
-    return this._PaymentMediumClass.addBankAccount(this._api, obj);
-  }
 }
 
 module.exports = Quote;

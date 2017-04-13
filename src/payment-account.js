@@ -33,6 +33,21 @@ class PaymentAccount {
       this._id
     ).then(addTrade);
   }
+
+  sell (bank) {
+    if (!this._quote) {
+      return Promise.reject('QUOTE_MISSING');
+    }
+    var delegate = this._quote.delegate;
+    var addTrade = (trade) => {
+      trade.debug = this._quote.debug;
+      delegate.trades.push(trade);
+      return delegate.save.bind(delegate)().then(() => trade);
+    };
+
+    return this._TradeClass.sell(this._quote, bank).then(addTrade);
+    // return this._TradeClass.sell(this._quote, this._id).then(addTrade);
+  }
 }
 
 module.exports = PaymentAccount;
