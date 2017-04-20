@@ -44,6 +44,8 @@ class Quote {
 
   get expiresAt () { return this._expiresAt; }
 
+  get currentTime () { return this._currentTime; }
+
   get paymentMediums () { return this._paymentMediums; }
 
   static getQuote (amount, baseCurrency, quoteCurrency, supportedCurrencies, debug) {
