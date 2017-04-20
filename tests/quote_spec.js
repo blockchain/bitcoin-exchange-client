@@ -35,7 +35,7 @@ describe('Quote', function () {
     q._feeCurrency = 'EUR';
     q._feeAmount = 1;
     q._expiresAt = 1;
-    q._currentTime = 0;
+    q._timeOfRequest = 0;
   });
 
   describe('class', function () {
@@ -71,7 +71,7 @@ expect(baseAmount).toEqual('1.00000000')).then(done)
     describe('getters', () =>
       it('should work', function () {
         expect(q.expiresAt).toBe(1);
-        expect(q.currentTime).toBe(0);
+        expect(q.timeOfRequest).toBe(0);
         expect(q.baseCurrency).toBe('EUR');
         expect(q.quoteCurrency).toBe('BTC');
         expect(q.baseAmount).toBe(1);

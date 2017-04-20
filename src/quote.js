@@ -44,7 +44,7 @@ class Quote {
 
   get expiresAt () { return this._expiresAt; }
 
-  get currentTime () { return this._currentTime; }
+  get timeOfRequest () { return this._timeOfRequest; }
 
   get paymentMediums () { return this._paymentMediums; }
 
