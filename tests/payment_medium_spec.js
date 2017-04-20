@@ -42,6 +42,7 @@ describe('Payment Medium', function () {
       expect(p.outCurrency).toEqual('BTC');
       expect(p.inMedium).toEqual('bank');
       expect(p.outMedium).toEqual('blockchain');
+      expect(p.minimumInAmounts).toEqual({});
       expect(p.fee).toEqual(0);
       expect(p.total).toEqual(0);
     });
