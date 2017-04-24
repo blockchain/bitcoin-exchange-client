@@ -33,6 +33,8 @@ class PaymentMedium {
 
   get outPercentageFee () { return this._outPercentageFee || 0; }
 
+  get minimumInAmounts () { return this._minimumInAmounts || {}; }
+
   get fee () { return this._fee; }
 
   get total () { return this._total; }
