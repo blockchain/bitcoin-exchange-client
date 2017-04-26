@@ -12,6 +12,8 @@ let stubs = {
   './payment-medium': PaymentMedium
 };
 
+let time = new Date().getTime();
+let expiration = time + 30000;
 let Quote = proxyquire('../src/quote-concrete', stubs);
 
 describe('Quote', function () {
@@ -34,7 +36,9 @@ describe('Quote', function () {
     q._quoteCurrency = 'BTC';
     q._feeCurrency = 'EUR';
     q._feeAmount = 1;
-    q._expiresAt = 1;
+    q._expiresAt = expiration;
+    q._timeOfRequest = time;
+    q._timeToExpiration = 1;
   });
 
   describe('class', function () {
@@ -69,7 +73,9 @@ expect(baseAmount).toEqual('1.00000000')).then(done)
   describe('instance', function () {
     describe('getters', () =>
       it('should work', function () {
-        expect(q.expiresAt).toBe(1);
+        expect(q.expiresAt).toBe(expiration);
+        expect(q.timeOfRequest).toBe(time);
+        expect(q.timeToExpiration).toBe(expiration - time - 1000);
         expect(q.baseCurrency).toBe('EUR');
         expect(q.quoteCurrency).toBe('BTC');
         expect(q.baseAmount).toBe(1);

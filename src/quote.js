@@ -15,6 +15,7 @@ class Quote {
     this._delegate = delegate;
     this._TradeClass = TradeClass;
     this._PaymentMediumClass = PaymentMediumClass;
+    this._timeOfRequest = new Date().getTime();
 
     this._paymentMediums = null;
   }
@@ -43,6 +44,10 @@ class Quote {
   get feeAmount () { return this._feeAmount; }
 
   get expiresAt () { return this._expiresAt; }
+
+  get timeOfRequest () { return this._timeOfRequest; }
+
+  get timeToExpiration () { return this._expiresAt - this._timeOfRequest - 1000; }
 
   get paymentMediums () { return this._paymentMediums; }
 
