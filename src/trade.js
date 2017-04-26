@@ -174,6 +174,16 @@ class Trade {
     return request(reservation.receiveAddress).then(processTrade).catch(error);
   }
 
+  static sell (quote, bankId, request) {
+    var error = function (e) {
+      console.error(e);
+      return Promise.reject(e);
+    };
+    return request(bankId).then((res) => {
+      return new quote._TradeClass(res, quote.api, quote.delegate);
+    }).catch(error);
+  }
+
   //
   _setTransactionHash (tx, amount, delegate) {
     var self = this;
