@@ -22,6 +22,8 @@ class Trade {
 
   get createdAt () { return this._createdAt; }
 
+  get expiresAt () { return this._expiresAt; }
+
   get inCurrency () { return this._inCurrency; }
 
   get outCurrency () { return this._outCurrency; }
