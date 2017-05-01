@@ -12,6 +12,7 @@ class Trade {
     this._expiresAt = null;
     this._delegate = delegate;
     this._api = api;
+    this._fromApi = false;
   }
 
   get debug () { return this._debug; }
@@ -158,7 +159,8 @@ class Trade {
     var reservation = quote.delegate.reserveReceiveAddress();
 
     var processTrade = function (res) {
-      var trade = new quote._TradeClass(res, quote.api, quote.delegate);
+      var trade = new quote._TradeClass(null, quote.api, quote.delegate);
+      trade.setFromAPI(res);
       trade.debug = quote.debug;
 
       /* istanbul ignore if */

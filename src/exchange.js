@@ -71,32 +71,23 @@ class Exchange {
     return this.getBuyQuote(-amount, baseCurrency, quoteCurrency);
   }
 
-  updateList (list, items, ListClass) {
-    var item;
-    for (var i = 0; i < items.length; i++) {
-      item = undefined;
-      for (var k = 0; k < list.length; k++) {
-        var itemId = Helpers.isNumber(items[i].id) ? items[i].id : items[i].id.toLowerCase();
-        if (list[k]._id === itemId) {
-          item = list[k];
-          item.debug = this.debug;
-          item.set.bind(item)(items[i]);
-        }
-      }
-      if (item === undefined) {
-        item = new ListClass(items[i], this._api, this.delegate, this);
-        item.debug = this.debug;
-        list.push(item);
-      }
-    }
-  }
-
   getTrades () {
     var save = () => {
       return this.delegate.save.bind(this.delegate)().then(() => this._trades);
     };
-    var update = (trades) => {
-      this.updateList(this._trades, trades, this._TradeClass);
+    var update = (tradeObjects) => {
+      for (let tradeObj of tradeObjects) {
+        let id = this._TradeClass.idFromAPI(tradeObj);
+
+        let trade = this._trades.find(trade => trade.id === id);
+
+        if (!trade) {
+          trade = new this._TradeClass(null, this._api, this.delegate);
+          this._trades.push(trade);
+        }
+
+        trade.setFromAPI(tradeObj);
+      }
     };
     var process = () => {
       for (let trade of this._trades) {
