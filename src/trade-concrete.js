@@ -36,6 +36,22 @@ class Trade extends AbstractTrade {
     };
     return super.buy(quote, medium, request);
   }
+
+  static sell (quote, bankId) {
+    const request = (bankId) => {
+      return quote.api.authPOST('trades', {
+        priceQuoteId: quote._id,
+        transferIn: {
+          medium: 'blockchain'
+        },
+        transferOut: {
+          medium: 'bank',
+          mediumReceiveAccountId: bankId
+        }
+      });
+    };
+    return super.sell(quote, bankId, request);
+  }
 }
 
 module.exports = Trade;

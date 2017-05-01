@@ -280,6 +280,26 @@ expect(trade.self()).toBe(trade))
       });
     });
 
+    describe('sell()', function () {
+      let quote;
+
+      beforeEach(function () {
+        quote = {
+          id: 101,
+          expiresAt: new Date(new Date().getTime() + 100000),
+          api,
+          delegate,
+          debug: false,
+          _TradeClass: Trade
+        };
+      });
+
+      it('should check that the quote is valid', function () {
+        quote.expiresAt = new Date(new Date().getTime() - 100000);
+        expect(() => { Trade.sell(quote, 12345); }).toThrow();
+      });
+    });
+
     describe('buy()', function () {
       let quote;
 
