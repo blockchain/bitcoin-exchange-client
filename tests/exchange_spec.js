@@ -237,7 +237,7 @@ expect(e._trades.length).toEqual(1);
       it('should update existing trades', function (done) {
         e._trades = [
           {
-            _id: 1,
+            id: 1,
             process () {},
             state: 'awaiting_transfer_in',
             set (obj) {
@@ -245,7 +245,7 @@ expect(e._trades.length).toEqual(1);
             }
           },
           {
-            _id: 2,
+            id: 2,
             process () {},
             state: 'awaiting_transfer_in',
             set (obj) {
@@ -268,7 +268,7 @@ expect(e._trades.length).toEqual(1);
       it('should not be case sensitive for existing trades', function (done) {
         e._trades = [
           {
-            _id: 'ab',
+            id: 'ab',
             process () {},
             state: 'awaiting_transfer_in',
             set (obj) {
@@ -276,7 +276,7 @@ expect(e._trades.length).toEqual(1);
             }
           },
           {
-            _id: 'cd',
+            id: 'cd',
             process () {},
             state: 'awaiting_transfer_in',
             set (obj) {
