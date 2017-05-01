@@ -9,6 +9,7 @@ class Trade {
     assert(api, 'API missing');
     assert(delegate, 'delegate missing');
     assert(typeof delegate.getReceiveAddress === 'function', 'delegate requires getReceiveAddress()');
+    this._expiresAt = null;
     this._delegate = delegate;
     this._api = api;
   }

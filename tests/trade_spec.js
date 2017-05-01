@@ -236,6 +236,7 @@ describe('Trade', function () {
       it('should work', function () {
         expect(trade.id).toEqual(1);
         expect(trade.createdAt).toBeDefined();
+        expect(trade.expiresAt).toBe(null);
         expect(trade.createdAt instanceof Date).toBeTruthy();
         expect(trade.inCurrency).toEqual('USD');
         expect(trade.outCurrency).toEqual('BTC');
