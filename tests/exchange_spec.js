@@ -184,6 +184,14 @@ expect(quote.quoteCurrency).toEqual('BTC');
       });
     });
 
+    describe('getSellQUote', function () {
+      it('should use Quote.getQuote', function () {
+        spyOn(Quote, 'getQuote').and.callThrough();
+        e.getSellQuote(1, 'BTC', 'EUR');
+        expect(Quote.getQuote).toHaveBeenCalled();
+      });
+    });
+
     describe('getTrades()', function () {
       it('should call Trade.fetchAll', function () {
         spyOn(Trade, 'fetchAll').and.callThrough();
