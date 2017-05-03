@@ -34,7 +34,7 @@ class PaymentAccount {
     ).then(addTrade);
   }
 
-  sell (bankId) {
+  sell () {
     if (!this._quote) {
       return Promise.reject('QUOTE_MISSING');
     }
@@ -45,7 +45,7 @@ class PaymentAccount {
       return delegate.save.bind(delegate)().then(() => trade);
     };
 
-    return this._TradeClass.sell(this._quote, bankId).then(addTrade);
+    return this._TradeClass.sell(this._quote, this._id).then(addTrade);
   }
 }
 
