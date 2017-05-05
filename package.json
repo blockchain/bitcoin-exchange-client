@@ -55,7 +55,8 @@
       "JasminePromiseMatchers",
       "jasmine",
       "spyOn",
-      "pending"
+      "pending",
+      "fail"
     ]
   },
   "engines": {

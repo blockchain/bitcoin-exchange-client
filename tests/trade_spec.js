@@ -43,7 +43,7 @@ describe('Trade', function () {
       });
 
       it('should create a Trade instance', function () {
-        let trade = new Trade({}, api, delegate);
+        let trade = new Trade({id: 1}, api, delegate);
         expect(trade instanceof Trade).toBeTruthy();
       });
     });
@@ -229,7 +229,7 @@ describe('Trade', function () {
 
       api = {
       };
-      trade = new Trade({}, api, delegate);
+      trade = new Trade({id: 1}, api, delegate);
     });
 
     describe('getters', () =>
