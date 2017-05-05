@@ -264,6 +264,7 @@ class Trade {
 
     var tradeFilter = function (trade) {
       return [
+        'awaiting_reference_number',
         'awaiting_transfer_in',
         'reviewing',
         'processing',
@@ -284,6 +285,7 @@ class Trade {
       // Only consider transactions that are complete or that we're still
       // expecting payment for:
       return [
+        'awaiting_reference_number',
         'awaiting_transfer_in',
         'processing',
         'reviewing',
