@@ -5,8 +5,7 @@ var AbstractTrade = require('./trade');
 
 class Trade extends AbstractTrade {
   constructor (obj, api, delegate) {
-    super(api, delegate);
-    this._id = 1;
+    super(obj, api, delegate);
     this._createdAt = new Date();
     this._inCurrency = 'USD';
     this._outCurrency = 'BTC';

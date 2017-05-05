@@ -8,8 +8,9 @@ var Quote = require('./quote');
 var PaymentMedium = require('./payment-medium');
 
 class Exchange extends AbstractExchange {
-  constructor (delegate) {
-    super(delegate, Trade, Quote, PaymentMedium);
+  constructor (obj, delegate) {
+    let api = {};
+    super(obj, delegate, api, Trade, Quote, PaymentMedium);
   }
 }
 

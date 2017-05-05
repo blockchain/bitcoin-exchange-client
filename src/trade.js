@@ -3,7 +3,7 @@
 var assert = require('assert');
 
 class Trade {
-  constructor (api, delegate) {
+  constructor (obj, api, delegate) {
     assert(this.constructor !== Trade, 'Abstract Class');
     assert(this.refresh, 'Subclass must implement refresh()');
     assert(api, 'API missing');
@@ -13,6 +13,14 @@ class Trade {
     this._delegate = delegate;
     this._api = api;
     this._fromApi = false;
+
+    if (obj !== null) {
+      this._id = obj.id;
+    }
+  }
+
+  setFromAPI () {
+    this._fromApi = true;
   }
 
   get debug () { return this._debug; }
