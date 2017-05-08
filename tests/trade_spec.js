@@ -299,6 +299,10 @@ expect(trade.self()).toBe(trade))
         quote.expiresAt = new Date(new Date().getTime() - 100000);
         expect(() => { Trade.sell(quote, 12345); }).toThrow();
       });
+
+      it('should fail with no bankId', function () {
+        expect(Trade.sell(quote, 'fail')).toBeRejected();
+      });
     });
 
     describe('buy()', function () {
