@@ -84,7 +84,8 @@ class Exchange {
     return this.getBuyQuote(-amount, baseCurrency, quoteCurrency);
   }
 
-  getTrades () {
+  getTrades (QuoteClass) {
+    assert(QuoteClass, 'QuoteClass required');
     var save = () => {
       return this.delegate.save.bind(this.delegate)().then(() => this._trades);
     };
@@ -99,6 +100,7 @@ class Exchange {
         if (!trade) {
           // We don't cache e.g. cancelled trades
           trade = new this._TradeClass(null, this._api, this.delegate);
+          trade._getQuote = QuoteClass.getQuote; // Prevents circular dependency
           this._trades.push(trade);
         }
 

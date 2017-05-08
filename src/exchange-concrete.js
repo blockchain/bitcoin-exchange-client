@@ -12,6 +12,10 @@ class Exchange extends AbstractExchange {
     let api = {};
     super(obj, delegate, api, Trade, Quote, PaymentMedium);
   }
+
+  getTrades () {
+    return super.getTrades(Quote);
+  }
 }
 
 module.exports = Exchange;
