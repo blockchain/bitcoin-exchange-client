@@ -5,8 +5,5 @@ module.exports = {
   PaymentMedium: require('./src/payment-medium'),
   Quote: require('./src/quote'),
   Trade: require('./src/trade'),
-  Helpers: require('./src/helpers'),
-  mocks: {
-    trade: require('./tests/mocks/trade.mock')
-  }
+  Helpers: require('./src/helpers')
 };
