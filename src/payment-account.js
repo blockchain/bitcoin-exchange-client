@@ -16,6 +16,12 @@ class PaymentAccount {
 
   get name () { return this._name; }
 
+  get account () { return this._account; }
+
+  get accountNumber () { return this._account._number; }
+
+  get quote () { return this._quote; }
+
   buy () {
     if (!this._quote) {
       return Promise.reject('QUOTE_MISSING');

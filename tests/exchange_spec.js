@@ -111,6 +111,13 @@ describe('Exchange', function () {
       })
     );
 
+    describe('profile', () =>
+      it('should be a getter', function () {
+        e._profile = { _country: 'GB' };
+        expect(e.profile).toEqual({ _country: 'GB' });
+      })
+    );
+
     describe('autoLogin', function () {
       beforeEach(() =>
         spyOn(e.delegate, 'save').and.callThrough());

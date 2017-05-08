@@ -47,6 +47,12 @@ class Trade {
 
   get bitcoinReceived () { return Boolean(this._txHash); }
 
+  get bankAccountNumber () { return this._bankAccountNumber; }
+
+  get transferIn () { return this._transferIn; }
+
+  get iSignThisID () { return this._iSignThisID; }
+
   get confirmed () {
     return this._confirmed || this._confirmations >= 3;
   }

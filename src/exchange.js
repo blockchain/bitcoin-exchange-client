@@ -47,6 +47,8 @@ class Exchange {
 
   get delegate () { return this._delegate; }
 
+  get profile () { return this._profile; }
+
   getBuyMethods () {
     return this._PaymentMediumClass.getAll(undefined, 'BTC', this._api);
   }

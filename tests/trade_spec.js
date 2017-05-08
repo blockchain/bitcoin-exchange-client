@@ -250,6 +250,9 @@ describe('Trade', function () {
         expect(trade.bitcoinReceived).toEqual(false);
         expect(trade.confirmed).toEqual(false);
         expect(trade.txHash).toEqual(null);
+        expect(trade.bankAccountNumber).toEqual('1234 ABCD 5678 EFGH');
+        expect(trade.transferIn.details.account).toEqual('123456789abcdefgh');
+        expect(trade.iSignThisID).toEqual('adsf231413-5c8f-4ecc-82jf-asdf22424');
       })
     );
 

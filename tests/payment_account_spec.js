@@ -57,7 +57,13 @@ expect(p.name).toEqual('John Do'));
 
     it('should have getters', function () {
       p._id = '1234';
+      p._account = { number: '123', bic: 'abc' };
+      p._account._number = '12345ABCD';
+      p._quote = { id: '123' };
       expect(p.id).toBe('1234');
+      expect(p.account.bic).toBe('abc');
+      expect(p.accountNumber).toBe('12345ABCD');
+      expect(p.quote.id).toBe('123');
     });
 
     describe('buy()', function () {
