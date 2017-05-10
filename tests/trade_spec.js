@@ -46,6 +46,11 @@ describe('Trade', function () {
         let trade = new Trade({id: 1}, api, delegate);
         expect(trade instanceof Trade).toBeTruthy();
       });
+
+      it('should keep a reference to the API', function () {
+        let t = new Trade(null, api, delegate);
+        expect(t._api).toBe(api);
+      });
     });
 
     describe('_checkOnce()', function () {
