@@ -123,5 +123,24 @@ expect(baseAmount).toEqual('1.00000000')).then(done)
         expect(PaymentMedium.getAll.calls.argsFor(0)[0]).toEqual('BTC');
       });
     });
+
+    describe('getPayoutMediums()', function () {
+      beforeEach(() => spyOn(PaymentMedium, 'getAll').and.callThrough());
+
+      it('should cache the result', function () {
+        q._paymentMediums = [];
+        q.getPayoutMediums();
+        expect(PaymentMedium.getAll).toHaveBeenCalled();
+      });
+
+      it('should get mediums with fiat currency if quote baseCurr is BTC', function () {
+        q._baseAmount = 1;
+        q._baseCurrency = 'BTC';
+        q._quoteCurrency = 'EUR';
+        q.getPayoutMediums();
+        expect(PaymentMedium.getAll).toHaveBeenCalled();
+        expect(PaymentMedium.getAll.calls.argsFor(0)[1]).toEqual('EUR');
+      });
+    });
   });
 });

@@ -47,6 +47,12 @@ class Trade {
 
   get bitcoinReceived () { return Boolean(this._txHash); }
 
+  get bankAccountNumber () { return this._bankAccountNumber; }
+
+  get transferIn () { return this._transferIn; }
+
+  get iSignThisID () { return this._iSignThisID; }
+
   get confirmed () {
     return this._confirmed || this._confirmations >= 3;
   }
@@ -175,6 +181,16 @@ class Trade {
     };
 
     return request(reservation.receiveAddress).then(processTrade).catch(error);
+  }
+
+  static sell (quote, bankId, request) {
+    var error = function (e) {
+      console.error(e);
+      return Promise.reject(e);
+    };
+    return request(bankId).then((res) => {
+      return new quote._TradeClass(res, quote.api, quote.delegate);
+    }).catch(error);
   }
 
   //

@@ -20,6 +20,9 @@ class Trade extends AbstractTrade {
     this._receiveAddress = '1abc';
     this._account_index = 0; // TODO: remove explicit reference to BIP 44 wallet
     this._txHash = null;
+    this._bankAccountNumber = '1234 ABCD 5678 EFGH';
+    this._transferIn = { details: { account: '123456789abcdefgh' } };
+    this._iSignThisID = 'adsf231413-5c8f-4ecc-82jf-asdf22424';
   }
 
   refresh () {
@@ -35,6 +38,17 @@ class Trade extends AbstractTrade {
       }
     };
     return super.buy(quote, medium, request);
+  }
+
+  static sell (quote, bankId) {
+    const request = (bankId) => {
+      if (bankId === 'fail') {
+        return Promise.reject();
+      } else {
+        return Promise.resolved({});
+      }
+    };
+    return super.sell(quote, bankId, request);
   }
 }
 

@@ -16,6 +16,12 @@ class PaymentAccount {
 
   get name () { return this._name; }
 
+  get account () { return this._account; }
+
+  get accountNumber () { return this._account._number; }
+
+  get quote () { return this._quote; }
+
   buy () {
     if (!this._quote) {
       return Promise.reject('QUOTE_MISSING');
@@ -32,6 +38,20 @@ class PaymentAccount {
       this.fiatMedium,
       this._id
     ).then(addTrade);
+  }
+
+  sell () {
+    if (!this._quote) {
+      return Promise.reject('QUOTE_MISSING');
+    }
+    var delegate = this._quote.delegate;
+    var addTrade = (trade) => {
+      trade.debug = this._quote.debug;
+      delegate.trades.push(trade);
+      return delegate.save.bind(delegate)().then(() => trade);
+    };
+
+    return this._TradeClass.sell(this._quote, this._id).then(addTrade);
   }
 }
 

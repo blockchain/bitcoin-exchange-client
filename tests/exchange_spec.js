@@ -111,6 +111,13 @@ describe('Exchange', function () {
       })
     );
 
+    describe('profile', () =>
+      it('should be a getter', function () {
+        e._profile = { _country: 'GB' };
+        expect(e.profile).toEqual({ _country: 'GB' });
+      })
+    );
+
     describe('autoLogin', function () {
       beforeEach(() =>
         spyOn(e.delegate, 'save').and.callThrough());
@@ -181,6 +188,14 @@ expect(quote.quoteCurrency).toEqual('BTC');
         let promise = e.getBuyQuote(1000, 'EUR').then(checks);
 
         expect(promise).toBeResolved(done);
+      });
+    });
+
+    describe('getSellQUote', function () {
+      it('should use Quote.getQuote', function () {
+        spyOn(Quote, 'getQuote').and.callThrough();
+        e.getSellQuote(1, 'BTC', 'EUR');
+        expect(Quote.getQuote).toHaveBeenCalled();
       });
     });
 
