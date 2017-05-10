@@ -200,7 +200,7 @@ class Trade {
     };
     return request(bankId).then((res) => {
       let trade = new quote._TradeClass(null, quote.api, quote.delegate);
-      trade.setFromAPI(trade);
+      trade.setFromAPI(res);
       trade.debug = quote.debug;
       return trade;
     }).catch(error);
