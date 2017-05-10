@@ -199,7 +199,10 @@ class Trade {
       return Promise.reject(e);
     };
     return request(bankId).then((res) => {
-      return new quote._TradeClass(res, quote.api, quote.delegate);
+      let trade = new quote._TradeClass(null, quote.api, quote.delegate);
+      trade.setFromAPI(trade);
+      trade.debug = quote.debug;
+      return trade;
     }).catch(error);
   }
 
