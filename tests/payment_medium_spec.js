@@ -5,9 +5,13 @@ let stubs = {
 
 let PaymentMedium = proxyquire('../src/payment-medium-concrete', stubs);
 let api;
+let quote;
 
 beforeEach(function () {
   api = {mock: 'api'};
+  quote = {
+    _TradeClass: {}
+  };
 
   return JasminePromiseMatchers.install();
 });
@@ -18,7 +22,7 @@ describe('Payment Medium', function () {
   describe('class', () =>
     describe('constructor', () =>
       it('should keep a reference to the api', function () {
-        let b = new PaymentMedium(api, undefined, {});
+        let b = new PaymentMedium(api, quote);
         expect(b._api).toEqual(api);
       })
     )
