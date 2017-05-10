@@ -3,7 +3,7 @@
 var assert = require('assert');
 
 class Trade {
-  constructor (api, delegate) {
+  constructor (obj, api, delegate) {
     assert(this.constructor !== Trade, 'Abstract Class');
     assert(this.refresh, 'Subclass must implement refresh()');
     assert(api, 'API missing');
@@ -12,6 +12,15 @@ class Trade {
     this._expiresAt = null;
     this._delegate = delegate;
     this._api = api;
+    this._fromApi = false;
+
+    if (obj !== null) {
+      this._id = obj.id;
+    }
+  }
+
+  setFromAPI () {
+    this._fromApi = true;
   }
 
   get debug () { return this._debug; }
@@ -158,7 +167,8 @@ class Trade {
     var reservation = quote.delegate.reserveReceiveAddress();
 
     var processTrade = function (res) {
-      var trade = new quote._TradeClass(res, quote.api, quote.delegate);
+      var trade = new quote._TradeClass(null, quote.api, quote.delegate);
+      trade.setFromAPI(res);
       trade.debug = quote.debug;
 
       /* istanbul ignore if */
@@ -189,7 +199,10 @@ class Trade {
       return Promise.reject(e);
     };
     return request(bankId).then((res) => {
-      return new quote._TradeClass(res, quote.api, quote.delegate);
+      let trade = new quote._TradeClass(null, quote.api, quote.delegate);
+      trade.setFromAPI(res);
+      trade.debug = quote.debug;
+      return trade;
     }).catch(error);
   }
 

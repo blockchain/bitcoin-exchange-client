@@ -30,8 +30,9 @@ module.exports = function (config) {
     },
 
     preprocessors: {
-      'src/**/*.js': ['browserify'],
-      'tests/**/*.js': ['browserify']
+      'src/**/*.js': ['browserify', 'coverage'],
+      'tests/**/*.js': ['browserify'],
+      'mocks/**/*.js': ['browserify']
     },
 
     browserify: {

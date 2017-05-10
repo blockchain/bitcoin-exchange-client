@@ -1,5 +1,9 @@
 let proxyquire = require('proxyquireify')(require);
 
+let mocks = {
+  trade: require('./mocks/trade.mock')
+};
+
 const API = () =>
   ({
     GET () {},
@@ -22,26 +26,8 @@ let Quote = {
   }
 };
 
-let Trade = obj => obj;
-let tradesJSON = [
-  {
-    id: 1,
-    state: 'awaiting_transfer_in'
-  }
-];
-Trade.spyableProcessTrade = function () {};
-Trade.fetchAll = () =>
-  Promise.resolve([
-    {
-      id: tradesJSON[0].id,
-      state: tradesJSON[0].state,
-      process: Trade.spyableProcessTrade
-    }
-  ])
-;
-
 let stubs = {
-  './trade': Trade,
+  './trade': mocks.trade.Trade,
   './quote': Quote,
   './api': API,
   './payment-medium': PaymentMedium
@@ -51,29 +37,55 @@ let Exchange = proxyquire('../src/exchange-concrete', stubs);
 
 describe('Exchange', function () {
   let e;
+  let cachedExchangeJSON;
 
-  beforeEach(() => JasminePromiseMatchers.install());
+  beforeEach(() => {
+    JasminePromiseMatchers.install();
+
+    mocks.trade.init();
+
+    cachedExchangeJSON = {
+      trades: [
+        {
+          id: 1,
+          state: 'awaiting_transfer_in'
+        },
+        {
+          id: 2,
+          state: 'awaiting_transfer_in'
+        }
+      ]
+    };
+  });
 
   afterEach(() => JasminePromiseMatchers.uninstall());
 
   describe('class', () =>
-    describe('new Exchange()', () =>
-
-      it('should work', function () {
-        e = new Exchange({}, Trade, Quote);
+    describe('new Exchange()', () => {
+      it('should work', () => {
+        e = new Exchange({}, {});
         expect(e.constructor.name).toEqual('Exchange');
-      })
-    )
+      });
+
+      it('should have an array of trades', () => {
+        e = new Exchange(cachedExchangeJSON, {});
+
+        expect(e.trades.length).toEqual(2);
+        expect(e.trades[0].id).toEqual(1);
+      });
+    })
   );
 
   describe('instance', function () {
-    beforeEach(function () {
-      e = new Exchange({
+    beforeEach(() => {
+      let delegate = {
         email () { return 'info@blockchain.com'; },
         isEmailVerified () { return true; },
         getEmailToken () { return 'json-web-token'; },
-        save () { return Promise.resolve(); }
-      }, Trade, Quote);
+        save () { return Promise.resolve(); },
+        releaseReceiveAddress () {}
+      };
+      e = new Exchange(cachedExchangeJSON, delegate, mocks.trade.Trade, Quote);
       e.api = new API();
     });
 
@@ -201,14 +213,15 @@ expect(quote.quoteCurrency).toEqual('BTC');
 
     describe('getTrades()', function () {
       it('should call Trade.fetchAll', function () {
-        spyOn(Trade, 'fetchAll').and.callThrough();
+        spyOn(mocks.trade.Trade, 'fetchAll').and.callThrough();
         e.getTrades();
-        expect(Trade.fetchAll).toHaveBeenCalled();
+        expect(mocks.trade.Trade.fetchAll).toHaveBeenCalled();
       });
 
-      it('should store the trades', function (done) {
-        let checks = res =>
-expect(e._trades.length).toEqual(1);
+      it('should hold on to the trades', function (done) {
+        let checks = res => {
+          expect(e._trades.length).toEqual(2);
+        };
 
         let promise = e.getTrades().then(checks);
         expect(promise).toBeResolved(done);
@@ -216,18 +229,18 @@ expect(e._trades.length).toEqual(1);
 
       it('should resolve the trades', function (done) {
         let checks = function (res) {
-          expect(res.length).toEqual(1);
+          expect(res.length).toEqual(2);
           return done();
         };
 
         e.getTrades().then(checks);
       });
 
-      it('should call process on each trade', function (done) {
-        spyOn(Trade, 'spyableProcessTrade');
+      it('should call setFromAPI on each trade', function (done) {
+        spyOn(mocks.trade.Trade, 'spyableSetFromAPI');
 
         let checks = function (res) {
-          expect(Trade.spyableProcessTrade).toHaveBeenCalled();
+          expect(mocks.trade.Trade.spyableSetFromAPI).toHaveBeenCalled();
           return done();
         };
 
@@ -235,58 +248,37 @@ expect(e._trades.length).toEqual(1);
       });
 
       it('should update existing trades', function (done) {
-        e._trades = [
-          {
-            _id: 1,
-            process () {},
-            state: 'awaiting_transfer_in',
-            set (obj) {
-              this.state = obj.state;
-            }
-          },
-          {
-            _id: 2,
-            process () {},
-            state: 'awaiting_transfer_in',
-            set (obj) {
-              this.state = obj.state;
-            }
-          }
-        ];
-
-        tradesJSON[0].state = 'completed_test';
+        mocks.trade.tradesJSON[0].state = 'completed_test';
 
         let checks = function () {
           expect(e._trades.length).toBe(2);
           expect(e._trades[0].state).toEqual('completed_test');
-          return done();
         };
 
-        return e.getTrades().then(checks);
+        return e.getTrades().then(checks).catch(fail).then(done);
+      });
+
+      it('should add non-cached trades', function (done) {
+        mocks.trade.tradesJSON.push({
+          id: 3,
+          state: 'cancelled'
+        });
+
+        let checks = function () {
+          expect(e._trades.length).toBe(3);
+          expect(e._trades[2].state).toEqual('cancelled');
+        };
+
+        return e.getTrades().then(checks).catch(fail).then(done);
       });
 
       it('should not be case sensitive for existing trades', function (done) {
-        e._trades = [
-          {
-            _id: 'ab',
-            process () {},
-            state: 'awaiting_transfer_in',
-            set (obj) {
-              this.state = obj.state;
-            }
-          },
-          {
-            _id: 'cd',
-            process () {},
-            state: 'awaiting_transfer_in',
-            set (obj) {
-              this.state = obj.state;
-            }
-          }
-        ];
+        e._trades[0]._id = 'ab';
+        e._trades[1]._id = 'cd';
 
-        tradesJSON[0].id = 'Ab';
-        tradesJSON[0].state = 'completed_test';
+        mocks.trade.tradesJSON[0].id = 'Ab';
+        mocks.trade.tradesJSON[1].id = 'cd';
+        mocks.trade.tradesJSON[0].state = 'completed_test';
 
         let checks = function () {
           expect(e._trades.length).toBe(2);
@@ -300,9 +292,9 @@ expect(e._trades.length).toEqual(1);
 
     describe('monitorPayments()', () =>
       it('should call Trade.monitorPayments', function () {
-        spyOn(Trade, 'monitorPayments');
+        spyOn(mocks.trade.Trade, 'monitorPayments');
         e.monitorPayments();
-        expect(Trade.monitorPayments).toHaveBeenCalled();
+        expect(mocks.trade.Trade.monitorPayments).toHaveBeenCalled();
       })
     );
   });
