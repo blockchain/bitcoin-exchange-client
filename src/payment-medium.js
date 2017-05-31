@@ -5,9 +5,13 @@ class PaymentMedium {
     assert(this.constructor !== PaymentMedium, 'Abstract Class');
     assert(api, 'API required');
     this._api = api;
-    this._quote = quote;
+
+    if (quote) {
+      this._quote = quote;
+      this._TradeClass = quote._TradeClass;
+    }
+
     this._accounts = [];
-    this._TradeClass = quote._TradeClass;
   }
 
   get accounts () { return this._accounts; }
