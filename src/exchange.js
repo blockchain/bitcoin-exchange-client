@@ -12,7 +12,7 @@ class Exchange {
     assert(api, 'API class required');
     assert(TradeClass, 'Trade class required');
     assert(QuoteClass, 'Quote class required');
-    assert(QuoteClass, 'PaymentMethod class required');
+    assert(PaymentMediumClass, 'PaymentMedium class required');
     assert(QuoteClass.getQuote, 'Quote.getQuote missing');
     this._delegate = delegate;
     this._api = api;
