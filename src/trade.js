@@ -60,6 +60,8 @@ class Trade {
 
   get transferIn () { return this._transferIn; }
 
+  get transferOut () { return this._transferOut; }
+
   get iSignThisID () { return this._iSignThisID; }
 
   get confirmed () {
