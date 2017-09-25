@@ -86,7 +86,8 @@ class Quote {
 
     let inCurrency = this.baseCurrency;
     let outCurrency = this.quoteCurrency;
-    if (this.baseCurrency === 'BTC' && this.baseAmount > 0) {
+    if (this.baseCurrency === 'BTC' && this.baseAmount > 0 ||
+        this.baseCurrency !== 'BTC' && this.baseAmount < 0) {
       inCurrency = this.quoteCurrency;
       outCurrency = this.baseCurrency;
     }
@@ -96,22 +97,6 @@ class Quote {
       return this._PaymentMediumClass.getAll(inCurrency, outCurrency, this._api, this)
                           .then(setPaymentMediums);
     }
-  }
-
-  getPayoutMediums () {
-    var self = this;
-    let outCurrency;
-    if (this.baseCurrency === 'BTC') {
-      outCurrency = this.quoteCurrency;
-    } else {
-      outCurrency = this.baseCurrency;
-    }
-    var setPaymentMediums = function (paymentMediums) {
-      self._paymentMediums = paymentMediums;
-      return self.paymentMediums;
-    };
-    return this._PaymentMediumClass.getAll('BTC', outCurrency, this._api, this)
-      .then(setPaymentMediums);
   }
 
 }

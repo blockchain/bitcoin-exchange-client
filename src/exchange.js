@@ -77,11 +77,11 @@ class Exchange {
     if (baseCurrency !== 'BTC') {
       quoteCurrency = 'BTC';
     }
-    return this._QuoteClass.getQuote(this._api, this._delegate, -amount, baseCurrency, quoteCurrency, this._debug);
+    return this._QuoteClass.getQuote(this._api, this._delegate, amount, baseCurrency, quoteCurrency, this._debug);
   }
 
   getSellQuote (amount, baseCurrency, quoteCurrency) {
-    return this.getBuyQuote(-amount, baseCurrency, quoteCurrency);
+    return this.getBuyQuote(amount, baseCurrency, quoteCurrency);
   }
 
   getTrades (QuoteClass) {
