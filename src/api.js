@@ -3,12 +3,12 @@ var assert = require('assert');
 
 class API {
   constructor () {
-    this._testnet = false;
+    this._sandbox = false;
   }
 
-  set testnet (value) {
+  set sandbox (value) {
     assert(Helpers.isBoolean(value), 'Boolean expected');
-    this._testnet = value;
+    this._sandbox = value;
   }
 
   set production (value) {

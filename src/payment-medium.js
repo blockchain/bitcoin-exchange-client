@@ -5,7 +5,12 @@ class PaymentMedium {
     assert(this.constructor !== PaymentMedium, 'Abstract Class');
     assert(api, 'API required');
     this._api = api;
-    this._quote = quote;
+
+    if (quote) {
+      this._quote = quote;
+      this._TradeClass = quote._TradeClass;
+    }
+
     this._accounts = [];
   }
 
@@ -38,6 +43,33 @@ class PaymentMedium {
   get fee () { return this._fee; }
 
   get total () { return this._total; }
+
+  /* Depending on the exchange partner, buy() needs to be called either on
+     PaymentMedium or on PaymentAccount. Examples:
+     * when buying with Coinify using a bank transfer, you don't need to register
+       a specific bank account. Call buy() on the PaymentMedium instance.
+     * when buying with SFOX via ACH, you need to specify which bank account.
+       call buy on a PaymentAccount instance.
+     * when selling with Coinify, you need to register the destination bank
+       account first, so call sell() on a PaymentAccount instance.
+  */
+
+  buy () {
+    if (!this._quote) {
+      return Promise.reject('QUOTE_MISSING');
+    }
+    var delegate = this._quote.delegate;
+    var addTrade = (trade) => {
+      trade.debug = this._quote.debug;
+      delegate.trades.push(trade);
+      return delegate.save.bind(delegate)().then(() => trade);
+    };
+
+    return this._TradeClass.buy(
+      this._quote,
+      this.fiatMedium
+    ).then(addTrade);
+  }
 }
 
 module.exports = PaymentMedium;

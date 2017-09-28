@@ -40,10 +40,10 @@ describe('API', function () {
         })
       );
 
-      describe('testnet', () =>
-        it('should set _testnet', function () {
-          api.testnet = true;
-          expect(api._testnet).toEqual(true);
+      describe('sandbox', () =>
+        it('should set _sandbox', function () {
+          api.sandbox = true;
+          expect(api._sandbox).toEqual(true);
         })
       );
     });

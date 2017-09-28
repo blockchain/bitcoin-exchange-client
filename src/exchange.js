@@ -6,18 +6,31 @@ var Helpers = require('./helpers');
 // https://gist.github.com/Zodiase/af44115098b20d69c531
 
 class Exchange {
-  constructor (delegate, TradeClass, QuoteClass, PaymentMediumClass) {
+  constructor (obj, delegate, api, TradeClass, QuoteClass, PaymentMediumClass) {
     assert(this.constructor !== Exchange, 'Abstract Class');
     assert(delegate, 'ExchangeDelegate required');
+    assert(api, 'API class required');
     assert(TradeClass, 'Trade class required');
     assert(QuoteClass, 'Quote class required');
-    assert(QuoteClass, 'PaymentMethod class required');
+    assert(PaymentMediumClass, 'PaymentMedium class required');
     assert(QuoteClass.getQuote, 'Quote.getQuote missing');
     this._delegate = delegate;
+    this._api = api;
     this._trades = [];
     this._TradeClass = TradeClass;
     this._QuoteClass = QuoteClass;
     this._PaymentMediumClass = PaymentMediumClass;
+
+    this._trades = [];
+
+    if (obj.trades) {
+      for (let tradeObj of obj.trades) {
+        var trade = new TradeClass(tradeObj, this._api, delegate);
+        trade._getQuote = QuoteClass.getQuote; // Prevents circular dependency
+        trade.debug = this._debug;
+        this._trades.push(trade);
+      }
+    }
   }
 
   get api () { return this._api; }
@@ -71,32 +84,28 @@ class Exchange {
     return this.getBuyQuote(-amount, baseCurrency, quoteCurrency);
   }
 
-  updateList (list, items, ListClass) {
-    var item;
-    for (var i = 0; i < items.length; i++) {
-      item = undefined;
-      for (var k = 0; k < list.length; k++) {
-        var itemId = Helpers.isNumber(items[i].id) ? items[i].id : items[i].id.toLowerCase();
-        if (list[k]._id === itemId) {
-          item = list[k];
-          item.debug = this.debug;
-          item.set.bind(item)(items[i]);
-        }
-      }
-      if (item === undefined) {
-        item = new ListClass(items[i], this._api, this.delegate, this);
-        item.debug = this.debug;
-        list.push(item);
-      }
-    }
-  }
-
-  getTrades () {
+  getTrades (QuoteClass) {
+    assert(QuoteClass, 'QuoteClass required');
     var save = () => {
       return this.delegate.save.bind(this.delegate)().then(() => this._trades);
     };
-    var update = (trades) => {
-      this.updateList(this._trades, trades, this._TradeClass);
+    var update = (tradeObjects) => {
+      for (let tradeObj of tradeObjects) {
+        let id = this._TradeClass.idFromAPI(tradeObj);
+
+        let trade = this._trades.find(trade => {
+          return String(trade.id).toLowerCase() === String(id).toLowerCase();
+        });
+
+        if (!trade) {
+          // We don't cache e.g. cancelled trades
+          trade = new this._TradeClass(null, this._api, this.delegate);
+          trade._getQuote = QuoteClass.getQuote; // Prevents circular dependency
+          this._trades.push(trade);
+        }
+
+        trade.setFromAPI(tradeObj);
+      }
     };
     var process = () => {
       for (let trade of this._trades) {
