@@ -22,7 +22,7 @@ class PaymentAccount {
 
   get quote () { return this._quote; }
 
-  buy () {
+  buy (subscription) {
     if (!this._quote) {
       return Promise.reject('QUOTE_MISSING');
     }
@@ -36,6 +36,7 @@ class PaymentAccount {
     return this._TradeClass.buy(
       this._quote,
       this.fiatMedium,
+      subscription,
       this._id
     ).then(addTrade);
   }
