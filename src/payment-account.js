@@ -36,8 +36,8 @@ class PaymentAccount {
     return this._TradeClass.buy(
       this._quote,
       this.fiatMedium,
-      subscription,
-      this._id
+      this._id,
+      subscription
     ).then(addTrade);
   }
 
