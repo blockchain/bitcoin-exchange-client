@@ -86,7 +86,7 @@ class Quote {
 
     let inCurrency = this.baseCurrency;
     let outCurrency = this.quoteCurrency;
-    if (this.baseCurrency === 'BTC' && this.baseAmount > 0) {
+    if (this.baseAmount > 0) {
       inCurrency = this.quoteCurrency;
       outCurrency = this.baseCurrency;
     }
