@@ -50,6 +50,8 @@ class Trade {
 
   get outAmountExpected () { return this._outAmountExpected; }
 
+  get receiveAmount () { return this._receiveAmount; }
+
   get receiveAddress () { return this._receiveAddress; }
 
   get accountIndex () { return this._account_index; }
