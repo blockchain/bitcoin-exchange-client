@@ -72,6 +72,8 @@ class Trade {
 
   get txHash () { return this._txHash || null; }
 
+  get feeAmount () { return this._feeAmount; }
+
   self () {
     return this;
   }
