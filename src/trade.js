@@ -50,6 +50,8 @@ class Trade {
 
   get outAmountExpected () { return this._outAmountExpected; }
 
+  get receiveAmount () { return this._receiveAmount; }
+
   get receiveAddress () { return this._receiveAddress; }
 
   get accountIndex () { return this._account_index; }
@@ -69,6 +71,8 @@ class Trade {
   }
 
   get txHash () { return this._txHash || null; }
+
+  get feeAmount () { return this._feeAmount; }
 
   self () {
     return this;

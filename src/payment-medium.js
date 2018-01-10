@@ -34,6 +34,10 @@ class PaymentMedium {
 
   get outFixedFee () { return this._outFixedFee || 0; }
 
+  get inFixedFees () { return this._inFixedFees || {}; }
+
+  get outFixedFees () { return this._outFixedFees || {}; }
+
   get inPercentageFee () { return this._inPercentageFee || 0; }
 
   get outPercentageFee () { return this._outPercentageFee || 0; }
