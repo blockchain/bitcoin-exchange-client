@@ -84,7 +84,7 @@ class Exchange {
     return this.getBuyQuote(-amount, baseCurrency, quoteCurrency);
   }
 
-  getTrades (QuoteClass) {
+  getTrades (QuoteClass, length) {
     assert(QuoteClass, 'QuoteClass required');
     var save = () => {
       return this.delegate.save.bind(this.delegate)().then(() => this._trades);
@@ -112,7 +112,8 @@ class Exchange {
         trade.process(this._trades);
       }
     };
-    return this._TradeClass.fetchAll(this._api)
+
+    return this._TradeClass.fetchAll(this._api, length)
                        .then(update)
                        .then(process)
                        .then(save);
